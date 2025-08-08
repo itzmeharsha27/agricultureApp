@@ -1,22 +1,36 @@
-const express=require('express')
-const router=express.Router()
-//  const cors=require'cors'
- const User=require ('../modules/User')
+const express = require('express');
+const router = express.Router();
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const User = require('../modules/User');
 
- router.post('/log',async(req,res)=>{
-    try{
-        const{name,email,password}=req.body;
+const SECRET_KEY = 'your_secret_key_here'; // Replace with secure key
 
-        const che=await User.findOn({email})
-        if(!che){
-return res.status(400).json({message:"user not found"})
-        }
-        if(!User.password==password)
-        {
-            return res.status(400).json({message:"password din't match "})
-        }
-        res.status(400).json({message:"loggedin successfully"})
-     }catch(error){}
- })
+router.post('/log', async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
- module.exports=router
+    if (!email || !password) {
+      return res.status(400).json({ ok: false, message: "Missing email or password" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ ok: false, message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ ok: false, message: "Incorrect password" });
+    }
+
+    const token = jwt.sign({ id: user._id }, SECRET_KEY);
+    res.json({ ok: true, message: "Login successful", token });
+
+  } catch (error) {
+    console.error("Login error:", error.message);
+    res.status(500).json({ ok: false, message: "Something went wrong" });
+  }
+});
+
+module.exports = router;

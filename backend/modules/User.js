@@ -1,10 +1,31 @@
-const mongoose =require('mongoose')
+const mongoose = require('mongoose');
+
+const UserSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  password: String,
+  selectedCrop: String,
+ 
 
 
-const UserSchema= new  mongoose.Schema({
-    name:'string',
-    email:'string',
-    password:'number'
-})
+    cropProgress: {
+    type: Map,
+    of: {
+      startDate: String,
+      taskData: Object
+    },
+    default: {}
+  },
 
-module.exports =mongoose.model("User",UserSchema)
+
+   profile: {
+    age: Number,
+    village: String,
+    contact: String,
+    landSize: String,
+    cropType: String,
+  }
+});
+
+
+module.exports = mongoose.model("User", UserSchema);

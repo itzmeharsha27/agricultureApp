@@ -1,13 +1,15 @@
-const mongoose=require ('mongoose')
+const mongoose = require('mongoose');
 
-const ConnectDB= (async()=>{
-    try{
-        await mongoose.connect('mongodb://localhost:27017/jeji',{useNewUrlParser: true,
-      useUnifiedTopology: true
-  });
-        console.log("mongo db connected")
+const ConnectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/jeji', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("MongoDB connected");
+  } catch (err) {
+    console.error("DB connection error:", err.message);
+  }
+};
 
-  }catch(err){}
-})
-
-module.exports =ConnectDB;
+module.exports = ConnectDB;
