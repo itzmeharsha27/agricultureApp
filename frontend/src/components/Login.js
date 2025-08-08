@@ -9,7 +9,7 @@ export default function Login() {
   const Loginhandle = async (e) => {
     e.preventDefault();
 
-    const res = await fetch('http://localhost:5000/api/log', {
+    const res = await fetch('https://agricultureapp-md0l.onrender.com/api/log', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: Email, password: Password }),
