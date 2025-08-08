@@ -1,0 +1,951 @@
+//BE/db.js
+const mongoose=require ('mongoose')
+
+const ConnectDB= (async()=>{
+    try{
+        await mongoose.connect('mongodb://localhost:27017/jeji',{useNewUrlParser: true,
+      useUnifiedTopology: true
+  });
+        console.log("mongo db connected")
+
+  }catch(err){}
+})
+
+module.exports =ConnectDB;
+
+//modules/user.js
+const mongoose =require('mongoose')
+
+
+const UserSchema= new  mongoose.Schema({
+    name:'string',
+    email:'string',
+    password:'number'
+})
+
+module.exports =mongoose.model("User",UserSchema)
+
+//routes/items
+// backend/routes/items.js
+const express = require('express');
+const router = express.Router();
+const { detail } = require('../Data'); // Path to your detail array
+
+// ✅ GET single crop by ID
+router.get('/items/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const item = detail.find(d => d.id === id);
+  if (item) {
+    res.json(item);
+  } else {
+    res.status(404).json({ message: 'Item not found' });
+  }
+});
+
+module.exports = router;
+
+
+//login
+const express=require('express')
+const router=express.Router()
+//  const cors=require'cors'
+ const User=require ('../modules/User')
+
+ router.post('/log',async(req,res)=>{
+    try{
+        const{name,email,password}=req.body;
+
+        const che=await User.findOn({email})
+        if(!che){
+return res.status(400).json({message:"user not found"})
+        }
+        if(!User.password==password)
+        {
+            return res.status(400).json({message:"password din't match "})
+        }
+        res.status(400).json({message:"loggedin successfully"})
+     }catch(error){}
+ })
+
+ module.exports=router
+//register
+const express=require ('express')
+const router=express.Router()
+//  const cors=require'cors'
+ const User =require ('../modules/User')
+
+ router.post('/reg',async(req,res)=>{
+    try{
+        const{name,email,password}=req.body;
+
+        const ext=await User.findOne({email})
+        if(ext){
+            return res.status(400).Json({message:'already exist'})
+        }
+        const new_user=new User({
+            name,
+            email,
+            password
+        })
+        await new_user.save();
+        console.log("registed successfully")
+    }catch(err){}
+ })
+
+ module.exports=router
+
+//.env
+MONGO_URI=mongodb://127.0.0.1:27017/jeji
+
+
+//cropData.js
+
+const cropYields = {
+  Rice: 2500,
+  Wheat: 2200,
+  Maize: 2800,
+  Cotton: 500,
+  Sugarcane: 35000,
+};
+
+module.exports = cropYields;
+
+
+//cropSuggetion
+// backend/cropSuggestions.js
+module.exports = {
+  wheat: {
+    duration: 120,
+    suggestions: [
+      { days: [1, 3], task: "Prepare soil and initial watering" },
+      { days: [4, 6], task: "Sow seeds and ensure moisture" },
+      { days: [7, 10], task: "First fertilizer application" },
+      { days: [11, 20], task: "Weed removal and pest check" },
+    ],
+  },
+  rice: {
+    duration: 150,
+    suggestions: [
+      { days: [1, 3], task: "Flood field and transplant seedlings" },
+      { days: [4, 6], task: "Maintain water levels" },
+      { days: [7, 10], task: "Apply nitrogen fertilizer" },
+      { days: [11, 20], task: "Weed control and insect monitoring" },
+    ],
+  },
+  tomato: {
+    duration: 90,
+    suggestions: [
+      { days: [1, 2], task: "Prepare nursery beds" },
+      { days: [3, 7], task: "Transplant seedlings" },
+      { days: [8, 14], task: "Water daily and apply compost" },
+      { days: [15, 30], task: "Weeding and pest control" },
+    ],
+  },
+  cotton: {
+    duration: 130,
+    suggestions: [
+      { days: [1, 3], task: "Sow seeds in moist soil" },
+      { days: [4, 10], task: "First round of watering" },
+      { days: [11, 20], task: "Pest inspection and spray if needed" },
+      { days: [21, 40], task: "Apply fertilizer" },
+    ],
+  },
+    chilli: {
+    duration: 120,
+    suggestions: [
+      { days: [1, 3], task: "hello" },
+      { days: [4, 6], task: "Sow seeds and ensure moisture" },
+      { days: [7, 10], task: "First fertilizer application" },
+      { days: [11, 20], task: "Weed removal and pest check" },
+    ],
+  },
+};
+
+//Data.js
+const detail = [
+  {
+    id: 1,
+    pname: "tomato",
+    timings: "10-06",
+    discription: "Your description here",
+    steps: "ballari",
+    imageUrl: "/tomato.jpg"
+  },
+  {
+    id: 2,
+    pname: "Cotton",
+    timings: "10-06",
+    steps: "chitrudurga",
+    imageUrl: "/cotton.jpg"
+  },
+  {
+    id: 3,
+    pname: "rice",
+    timings: "10-06",
+    steps: "ballari",
+    imageUrl: "/rice.jpg"
+  },
+  {
+    id: 4,
+    pname: "Wheat",
+    timings: "90-07",
+    steps: "ballari",
+    imageUrl: "/wheat.jpg"
+  },
+  {
+    id: 5,
+    pname: "Jawar",
+    timings: "10-06",
+    steps: "ballari",
+    imageUrl: "/jola.jpg"
+  },
+  {
+    id: 6,
+    pname: "Chilli",
+    timings: "10-06",
+    steps: "ballari",
+    imageUrl: "/chilli.jpg"
+  }
+];
+
+module.exports = { detail };
+
+//index.js
+// backend/index.js
+const express = require("express");
+const router = express.Router();
+const cropData = require("./cropSuggestions");
+
+router.post("/getSuggestions", (req, res) => {
+  const { crop, startDate } = req.body;
+
+  const today = new Date();
+  const start = new Date(startDate);
+  const daysPassed = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+
+  const cropKey = crop.trim().toLowerCase();
+  const cropInfo = cropData[cropKey];
+
+  if (!cropInfo) {
+    return res.status(404).json({ message: "Crop not found" });
+  }
+
+  const matched = cropInfo.suggestions.filter(
+    (s) => daysPassed < s.days[0] && daysPassed <= s.days[1]
+  );
+
+  res.json({
+    crop: cropKey,
+    daysPassed,
+    suggestions: matched,
+  });
+});
+
+module.exports = router;
+
+//index2
+const express = require('express');
+const cors = require('cors');
+const router = express.Router();
+
+router.use(cors());
+router.use(express.json());
+
+const cropYields = {
+  Rice: 2500,
+  Wheat: 2200,
+  Maize: 2800,
+  Cotton: 500,
+  Sugarcane: 35000,
+};
+
+router.post('/predict', (req, res) => {
+  const { crop, acres } = req.body;
+
+  if (!crop || !acres || isNaN(acres)) {
+    return res.status(400).json({ error: "Invalid input" });
+  }
+
+  const predictedYield = parseFloat(acres) * cropYields[crop];
+  res.json({ crop, acres, predictedYield });
+});
+
+module.exports = router;
+
+//server.js
+const express=require('express')
+const router=express.Router();
+const cors=require('cors')
+const ConnectDB=require('./config/db.js')
+const { detail } = require('./Data'); // adjust path
+
+
+const app=express();
+app.use(cors())
+
+app.use(express.json())
+
+ConnectDB();
+
+const itemmm=require("./routes/items")
+app.use('/api',itemmm)
+
+const regiauth=require("./routes/Register")
+app.post('/api/reg',regiauth)
+
+const logauth=require("./routes/login.js")
+app.post('/api/log',logauth)
+
+
+const cropss=require("./index.js")
+app.use("/farmer",cropss)
+
+
+const cropss2=require("./index2.js")
+app.use("/",cropss2)
+
+// router.get('/api/items/:id', (req, res) => {
+//   const id = parseInt(req.params.id);
+//   const item = detail.find(d => d.id === id);
+//   if (item) {
+//     res.json(item);
+//   } else {
+//     res.status(404).json({ message: 'Item not found' });
+//   }
+// });
+
+
+const PORT=5000;
+app.listen(PORT,()=>{
+    console.log(`port is runnin on ${PORT}`);
+})
+
+//cropGuide2.js
+import React, { useState } from 'react';
+
+export default function CropGuide2() {
+  const [crop, setCrop] = useState('');
+  const [acres, setAcres] = useState('');
+  const [result, setResult] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const res = await fetch('http://localhost:5000/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ crop, acres: Number(acres) }),
+    });
+
+    const data = await res.json();
+    setResult(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} style={{ padding: '20px' }}>
+      <h2>Crop Yield Predictor</h2>
+
+      <label>Crop:</label>
+      <select value={crop} onChange={(e) => setCrop(e.target.value)} required>
+        <option value="">Select Crop</option>
+        <option value="Rice">Rice</option>
+        <option value="Wheat">Wheat</option>
+        <option value="Maize">Maize</option>
+        <option value="Cotton">Cotton</option>
+        <option value="Sugarcane">Sugarcane</option>
+      </select>
+
+      <br /><br />
+
+      <label>Acres:</label>
+      <input
+        type="number"
+        value={acres}
+        onChange={(e) => setAcres(e.target.value)}
+        required
+      />
+
+      <br /><br />
+      <button type="submit">Predict Yield</button>
+
+      {result && (
+        <div style={{ marginTop: '20px' }}>
+          <h3>Prediction Result</h3>
+          <p>Crop: {result.crop}</p>
+          <p>Acres: {result.acres}</p>
+          <p>Expected Yield: {result.predictedYield} kg</p>
+        </div>
+      )}
+    </form>
+  );
+}
+
+//cropSuggetion
+import React, { useState } from 'react';
+
+const AgriRecommendation = () => {
+  const [soil, setSoil] = useState('');
+  const [env, setEnv] = useState('');
+  const [water, setWater] = useState('');
+  const [showData, setShowData] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setShowData(true);
+  };
+
+  return (
+    <div className="p-5 max-w-md mx-auto bg-white rounded-xl shadow-md">
+      <h2 className="text-xl font-bold mb-4">Select Your Farming Conditions</h2>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label>Soil Type:</label>
+          <select
+            className="w-full border p-2 rounded"
+            value={soil}
+            onChange={(e) => setSoil(e.target.value)}
+            required
+          >
+            <option value="">Select</option>
+            <option value="black">Black Soil</option>
+            <option value="red">Red Soil</option>
+            <option value="alluvial">Alluvial Soil</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Environment:</label>
+          <select
+            className="w-full border p-2 rounded"
+            value={env}
+            onChange={(e) => setEnv(e.target.value)}
+            required
+          >
+            <option value="">Select</option>
+            <option value="dry">Dry</option>
+            <option value="humid">Humid</option>
+            <option value="moderate">Moderate</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Water Level:</label>
+          <select
+            className="w-full border p-2 rounded"
+            value={water}
+            onChange={(e) => setWater(e.target.value)}
+            required
+          >
+            <option value="">Select</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+
+        <button
+          type="submit"
+          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+        >
+          Show Recommendations
+        </button>
+      </form>
+
+      {showData && (
+        <div className="mt-6 bg-gray-100 p-4 rounded">
+          <h3 className="text-lg font-semibold mb-2">Recommendations:</h3>
+
+          {/* Combo Matches */}
+          {soil === 'black' && env === 'dry' && water === 'low' && (
+            <p>🌾 Try Cotton, Sorghum, and Bajra</p>
+          )}
+          {soil === 'alluvial' && env === 'humid' && water === 'high' && (
+            <p>🌾 Grow Rice, Sugarcane, and Jute</p>
+          )}
+          {soil === 'red' && env === 'moderate' && water === 'medium' && (
+            <p>🌾 Recommended: Groundnut, Potato, and Maize</p>
+          )}
+          {(soil && env && water) &&
+            !(soil === 'black' && env === 'dry' && water === 'low') &&
+            !(soil === 'alluvial' && env === 'humid' && water === 'high') &&
+            !(soil === 'red' && env === 'moderate' && water === 'medium') && (
+              <p>🌿 Try mixed cropping with pulses and oilseeds.</p>
+          )}
+
+          {/* Individual Suggestions */}
+          {soil === 'black' && <p>🌿 Suitable: Cotton, Soybean, Sorghum</p>}
+          {soil === 'red' && <p>🌿 Suitable: Groundnut, Millet, Potato</p>}
+          {soil === 'alluvial' && <p>🌿 Suitable: Rice, Wheat, Sugarcane</p>}
+
+          {env === 'humid' && <p>☁️ Advice: Good for paddy and sugarcane</p>}
+          {env === 'dry' && <p>☀️ Advice: Use drought-resistant crops</p>}
+          {env === 'moderate' && <p>🌤️ Grow wide range of seasonal crops</p>}
+
+          {water === 'low' && <p>💧 Use drip irrigation</p>}
+          {water === 'medium' && <p>💧 Balanced watering is good</p>}
+          {water === 'high' && <p>💧 Avoid water-logging; suitable for paddy</p>}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AgriRecommendation;
+
+
+//Data.js
+const detail = [
+  {
+    id: 1,
+    pname: "tomato",
+    timings: "10-06",
+    discription: "Your description here",
+    steps: "ballari",
+    imageUrl: "/tomato.jpg"
+  },
+  {
+    id: 2,
+    pname: "Cotton",
+    timings: "10-06",
+    steps: "chitrudurga",
+    imageUrl: "/cotton.jpg"
+  },
+  {
+    id: 3,
+    pname: "rice",
+    timings: "10-06",
+    steps: "ballari",
+    imageUrl: "/rice.jpg"
+  },
+  {
+    id: 4,
+    pname: "Wheat",
+    timings: "90-07",
+    steps: "ballari",
+    imageUrl: "/wheat.jpg"
+  },
+  {
+    id: 5,
+    pname: "Jawar",
+    timings: "10-06",
+    steps: "ballari",
+    imageUrl: "/jola.jpg"
+  },
+  {
+    id: 6,
+    pname: "Chilli",
+    timings: "10-06",
+    steps: "ballari",
+    imageUrl: "/chilli.jpg"
+  }
+];
+
+module.exports = { detail };
+
+//Login.js
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+// import { method } from "requests";
+
+
+
+
+export default function Login(){
+
+    const [Email,setEmail]=useState('')
+    const[Password, setPassword]=useState('')
+
+    const Navigate=useNavigate();
+
+
+    const  Loginhandle=async(e)=>{
+        e.PrventDefault();
+
+        try{
+            const res=await
+            fetch('http://localhost:5000/api/log',{
+                method :'POST',
+                headers: {'Content-Type': 'application/json'},
+                body:JSON.stringify({Email,Password}),
+            });
+
+            const data=await res.json();
+
+            if(data.ok){
+                localStorage.setItem('token',data.token)
+                Navigate('./a/login/Page1')
+            }else{
+                alert('Login faild');
+            }
+            }catch(error){
+            console.log('error')
+        }
+    }
+    return(
+    <>
+    
+    
+    <div id="lo">   
+        
+    <form id="login" onSubmit={Loginhandle}>
+          <img  src="/farmer.jpg" alt="logo" />
+      
+    <input id="lg" type="text" placeholder="email" value={Email} 
+             onChange={(e)=>setEmail(e.target.value)}>
+             </input>
+    <input id="lgg" type="text" placeholder="Password" value={Password} 
+             onChange={(e)=>setPassword(e.target.value)}></input>
+    <button id="lgg" type="submit">submit</button>
+    </form>
+ </div>
+    </>
+    )
+}
+
+
+page1
+
+import { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
+import { detail } from './Data'; // adjust path
+
+
+
+
+function Navbar(){
+    const [open , setOpen]=useState(false)
+
+    return(
+        <>
+        <div>
+         <div id="ab">
+                 
+                               <div>logo</div>
+           <div>center</div>
+         <button onClick={()=>setOpen(!open)}>&#67336</button>
+        </div>
+     {open && (
+  <div id="inside">
+    {/* <Link to="/a/register">Register</Link>
+    <Link to="/a/login"></Link> */}
+   
+    {/* <Link to="/a/oils">Oils</Link> */}
+<Link to="/a/predict">Prediction</Link>
+    <Link to="/a/cs">suggestions</Link>
+  </div>
+ 
+  
+)}
+</div>
+ 
+
+        
+        </>
+    )
+}
+
+
+
+
+export default function Page1(){
+  
+ const details=detail.map((item)=>(
+  <div key={item.id}  id="fp">
+  <ul  >
+      <Link to={`/a/${item.id}`}> 
+      <img src={item.imageUrl}/>
+        <li> {item.pname} </li>
+         <li>{item.timings} </li>
+      </Link> 
+     
+  </ul>    
+  </div>
+ ));
+   
+
+return(
+  <>
+  <Navbar/>
+    <h3>{details}</h3>
+    
+  
+  
+  </>
+)
+
+}
+//page2
+
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { detail } from "./Data"
+
+
+export default function Page2(){
+
+    const {id}=useParams();
+
+    const [items, setItems] = useState(null);
+    // const [data ,setdata]=useState(null)
+
+    useEffect(()=>{
+
+    fetch(`http://localhost:5000/api/items/${id}`)
+    .then(res=>res.json())
+    .then(data=>setItems(data))
+    
+  },[id]);
+  const match = detail.find((item) => item.id === parseInt(id));
+
+  const detailsss= 
+  
+      <div>
+        {match ?(
+        <div>
+            <h2>{match.pname}</h2>
+            <h2>{match.discription}</h2>
+        </div>
+      ):
+      <div>loading...</div>
+    }
+        </div>
+
+
+return(
+    <>
+     
+ <div>{detailsss}</div>
+     
+     <div>if you are starting to grow then click this button login and start</div>
+     <Link to={`/a/{:id}/Login`}>
+     <button>click Me</button>
+    
+     </Link>
+    
+    <Link to={`/a/{:id}/farmer`}>
+    <button>go to to-gether flow</button>
+    </Link>
+
+    <Link to={`/a/${id}/fertilizer`}>
+      <button>View Fertilizer Info</button>
+    </Link>
+    </>
+)
+}
+
+//page3
+// client/src/CropGuide.js
+import React, { useState } from "react";
+import { Link, useParams } from "react-router-dom";
+
+
+const CropGuide = () => {
+  const [crop, setCrop] = useState("wheat");
+  const [startDate, setStartDate] = useState("");
+  const [data, setData] = useState(null);
+
+  const {id}=useParams();
+
+  const handleSubmit = async () => {
+    const res = await fetch("http://localhost:5000/farmer", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ crop, startDate })
+    });
+    const json = await res.json();
+    setData(json);
+  };
+
+  return (
+    <>
+    <div>
+      <h2>Crop Growth Guide</h2>
+      <label>Select Crop: </label>
+      <select value={crop} onChange={(e) => setCrop(e.target.value)}>
+        <option value="wheat">Wheat</option>
+           {/* <option value="tomato">tomato</option> */}
+        <option value="paddy">paddy</option>
+        <option value="tomato">tomato</option>
+        <option value="cotton">cotton</option>
+        <option value="chilli">chilli</option>
+      </select>
+
+      <br /><br />
+
+      <label>Start Date: </label>
+      <input type="date" onChange={(e) => setStartDate(e.target.value)} />
+
+      <br /><br />
+
+      <button onClick={handleSubmit}>Get Suggestions</button>
+
+      {data && (
+        <div style={{ marginTop: "20px" }}>
+          <h4>Day {data.daysPassed} of {data.crop} growth:</h4>
+{Array.isArray(data.suggestions) && data.suggestions.length > 0 ? (            data.suggestions.map((s, idx) => (
+              <li key={idx}>{s.task} (Days {s.days[0]}–{s.days[1]})</li>
+            ))
+          ) : (
+            <p>No tasks for today.</p>
+          )}
+        </div>
+      )}
+    </div>
+
+  
+    </>
+  );
+};
+
+export default CropGuide;
+
+//page4
+import { useParams } from "react-router-dom";
+import { detail } from "./Data";
+
+export default function Page4() {
+  const { id } = useParams();
+  const match = detail.find((item) => item.id === parseInt(id));
+
+  if (!match) {
+    return <div>Crop not found..</div>;
+  }
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h2>{match.pname} Fertilizer Guide</h2>
+      <img src={match.imageUrl} alt={match.pname} style={{ width: "200px" }} />
+      <p><strong>Timings:</strong> {match.timings}</p>
+      <p><strong>Region:</strong> {match.steps}</p>
+
+      <h3>Recommended Fertilizers:</h3>
+      <ul>
+        {match.fertilizer?.map((item, index) => (
+          <li key={index}>{item}</li>
+        ))}
+      </ul>
+
+      {match.fertilizerImg && (
+        <div>
+          <h4>Fertilizer Image:</h4>
+          <img src={match.fertilizerImg} alt="Fertilizer" style={{ width: "200px" }} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+//register.js
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+// import { method } from "requests";
+
+
+
+
+export default function Login(){
+
+    const [Email,setEmail]=useState('')
+    const[Password, setPassword]=useState('')
+
+    const Navigate=useNavigate();
+
+
+    const  Loginhandle=async(e)=>{
+        e.PrventDefault();
+
+        try{
+            const res=await
+            fetch('http://localhost:5000/api/reg',{
+                method :'POST',
+                headers: {'Content-Type': 'application/json'},
+                body:JSON.stringify({Email,Password}),
+            });
+
+            const data=await res.json();
+
+            if(data.ok){
+                localStorage.setItem('token',data.token)
+                Navigate('./a/Login')
+            }else{
+                alert('Login faild');
+            }
+            }catch(error){
+            console.log('error')
+        }
+    }
+    return(
+    <>
+    <form onSubmit={Loginhandle}>
+    <input type="text" placeholder="email" value={Email} 
+             onChange={(e)=>setEmail(e.target.value)}></input>
+    <input type="text" placeholder="Password" value={Password} 
+             onChange={(e)=>setPassword(e.target.value)}></input>
+    <button type="submit">submit</button>
+    </form>
+    </>
+    )
+}
+
+//wlcm
+// Page1.js
+import { Link } from "react-router-dom";
+
+export default function Page1() {
+  return (
+    <div style={{ textAlign: "center", padding: "50px" }}>
+      <h1>Welcome to Smart Farmer App</h1>
+
+      <Link to="/a/login">
+        <button style={{ margin: "10px" }}>Login</button>
+      </Link>
+
+      <Link to="/a/register">
+        <button style={{ margin: "10px" }}>Register</button>
+      </Link>
+    </div>
+  );
+}
+
+
+//app.js
+import logo from './logo.svg';
+import { BrowserRouter as Router,Routes ,Route } from 'react-router-dom';
+import './App.css';
+import Wlcm from './components/Wlcm'
+import Page1 from './components/Page1'
+import Page2 from './components/Page2'
+
+import Page4 from './components/Page4'
+import Register from './components/Register'
+import Login from './components/Login'
+ import Page22 from './components/Page3'
+ import CropGuide2 from './components/CropGuide2'
+ import CropSug from './components/CropSug'
+export default function App() {
+  return (
+    <>
+
+    <Router>
+      <Routes>
+        <Route path='/' element={<Wlcm/>}/>
+        <Route path='/a/login/page1'element={<Page1/>}/>
+        <Route path='/a/:id/farmer'element={<Page22/>}/>
+        <Route path='/a/:id'element={<Page2/>}/>
+        
+        <Route path='/a/:id/register'element={<Register/>}/>
+        <Route path='/a/register'element={<Register/>}/>
+        {/* <Route path='/a/:id/Login'element={<Login/>}/> */}
+        <Route path='/a/Login'element={<Login/>}/>
+        {/* <Route path='/a/:id/farmer'element={<CropGuide/>}/> */}
+        <Route path="/a/predict" element={<CropGuide2 />} />
+        <Route path='/a/cs'element={<CropSug/>}/>
+<Route path="/a/:id/fertilizer" element={<Page4 />} />
+
+      </Routes>
+    </Router>
+
+    </>
+  )}
+  
