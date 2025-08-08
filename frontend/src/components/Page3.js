@@ -14,6 +14,9 @@ const CropGuide = () => {
 useEffect(() => {
   const email = localStorage.getItem("email");
   const selectedCrop = localStorage.getItem("selectedCrop");
+  const storedStartDate = localStorage.getItem("startDate");
+if (!startDate && storedStartDate) setStartDate(storedStartDate);
+
 
   if (!email || !selectedCrop) return;
 
@@ -74,6 +77,8 @@ const handleSubmit = async () => {
 
   const json = await res.json();
   setData(json);
+  localStorage.setItem("startDate", startDate);
+
 };
 
 
