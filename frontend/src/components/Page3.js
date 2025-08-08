@@ -20,7 +20,7 @@ useEffect(() => {
   setCrop(selectedCrop);
 
   // Load startDate for this crop
-  fetch("http://localhost:5000/farmerdata/load", {
+  fetch("https://agricultureapp-md0l.onrender.com/farmerdata/load", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, selectedCrop }),
@@ -31,7 +31,7 @@ useEffect(() => {
         setStartDate(startDate);
 
         // ✅ Fetch tasks for the selected crop
-        const res = await fetch("http://localhost:5000/farmer/getSuggestions", {
+        const res = await fetch("https://agricultureapp-md0l.onrender.com/farmer/getSuggestions", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -60,13 +60,13 @@ const handleSubmit = async () => {
     return;
   }
 
-  await fetch("http://localhost:5000/farmerdata/save", {
+  await fetch("https://agricultureapp-md0l.onrender.com/farmerdata/save", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, selectedCrop, startDate }),
   });
 
-  const res = await fetch("http://localhost:5000/farmer/getSuggestions", {
+  const res = await fetch("https://agricultureapp-md0l.onrender.com/farmer/getSuggestions", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ crop: selectedCrop.toLowerCase(), startDate }),

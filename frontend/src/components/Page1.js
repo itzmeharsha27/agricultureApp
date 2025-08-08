@@ -6,7 +6,7 @@ function Navbar({ farmerName }) {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    fetch("http://localhost:5000/api/logout", { method: "POST" });
+    fetch("https://agricultureapp-md0l.onrender.com/api/logout", { method: "POST" });
     window.location.href = "/";
   };
 
@@ -37,7 +37,7 @@ export default function Page1() {
   const [farmerName, setFarmerName] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/items")
+    fetch("https://agricultureapp-md0l.onrender.com/api/items")
       .then((res) => res.json())
       .then((data) => {
         setCrops(data);
@@ -50,7 +50,7 @@ export default function Page1() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      fetch("http://localhost:5000/api/get-profile", {
+      fetch("https://agricultureapp-md0l.onrender.com/api/get-profile", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

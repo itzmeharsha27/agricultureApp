@@ -7,7 +7,7 @@ export default function Page2() {
   const [items, setItems] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/items/${id}`)
+    fetch(`https://agricultureapp-md0l.onrender.com/api/items/${id}`)
       .then(res => res.json())
       .then(data => setItems(data));
   }, [id]);
