@@ -1,3 +1,5 @@
+require('dotenv').config(); // ✅ Load environment variables at the top
+
 const express=require('express')
 const router=express.Router();
 const cors=require('cors')
