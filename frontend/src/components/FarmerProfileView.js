@@ -5,7 +5,7 @@ export default function FarmerProfileView() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("http://localhost:5000/api/get-profile", {
+    fetch("https://agricultureapp-md0l.onrender.com/api/get-profile", {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())

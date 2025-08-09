@@ -5,7 +5,7 @@ export default function CropPricePredictor() {
   const [result, setResult] = useState(null);
 
   const handlePredict = async () => {
-    const res = await fetch('http://localhost:5000/api/predict-price', {
+    const res = await fetch('https://agricultureapp-md0l.onrender.com/api/predict-price', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ current_month: month })

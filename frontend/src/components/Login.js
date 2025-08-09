@@ -22,7 +22,7 @@ export default function Login() {
       localStorage.setItem('email', Email);
 
       // ✅ Check if profile exists
-      const profileRes = await fetch('http://localhost:5000/api/get-profile', {
+      const profileRes = await fetch('https://agricultureapp-md0l.onrender.com/api/get-profile', {
         headers: { Authorization: `Bearer ${data.token}` }
       });
       const profileData = await profileRes.json();

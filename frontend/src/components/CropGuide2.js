@@ -8,7 +8,7 @@ export default function CropGuide2() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch('http://localhost:5000/predict', {
+    const res = await fetch('https://agricultureapp-md0l.onrender.com/predict', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ crop, acres: Number(acres) }),

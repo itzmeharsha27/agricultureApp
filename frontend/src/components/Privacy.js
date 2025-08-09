@@ -1,3 +1,4 @@
+
 function Privacy() {
   return (
     <div style={{ padding: '30px', maxWidth: '800px', margin: 'auto' }}>

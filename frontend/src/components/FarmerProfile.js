@@ -19,7 +19,7 @@ export default function FarmerProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
-    const res = await fetch("http://localhost:5000/api/save-profile", {
+    const res = await fetch("https://agricultureapp-md0l.onrender.com/api/save-profile", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { detail } from "./Data";
@@ -65,3 +66,5 @@ export default function Page2() {
     </div>
   );
 }
+
+Folder: frontend/src/components
