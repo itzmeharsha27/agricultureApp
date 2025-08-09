@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../modules/User');
 
-const SECRET_KEY = 'your_secret_key_here'; // Replace with secure key
+const SECRET_KEY = process.env.SECRET_KEY;
 
 router.post('/log', async (req, res) => {
   try {
