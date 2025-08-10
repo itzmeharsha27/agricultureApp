@@ -5,7 +5,11 @@ console.log("SECRET_KEY from env:", process.env.SECRET_KEY || "❌ Not Found");
 
 const express=require('express')
 const router=express.Router();
-const cors=require('cors')
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 const ConnectDB=require('./config/db.js')
 const { detail } = require('./Data'); // adjust path
 

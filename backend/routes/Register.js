@@ -5,7 +5,7 @@ const User = require('../modules/User');
 
 router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
-  console.log('Received registration:', req.body);
+  console.log('📩 Received registration:', req.body);
 
   try {
     const existingUser = await User.findOne({ email });
@@ -19,7 +19,7 @@ router.post('/register', async (req, res) => {
 
     res.json({ success: true, message: 'User registered successfully' });
   } catch (err) {
-    console.error('🔥 Registration error:', err.message);
+    console.error('🔥 Registration error (full):', err); // ✅ FULL ERROR
     res.status(500).json({ success: false, message: 'Something went wrong during registration' });
   }
 });
