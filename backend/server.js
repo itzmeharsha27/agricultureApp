@@ -112,12 +112,12 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// (Optional) If you want specific frontend origin instead of "*"
-// app.use(cors({
-//   origin: ["https://your-vercel-app-url.vercel.app"],
-//   methods: ["GET", "POST", "PUT", "DELETE"],
-//   credentials: true
-// }));
+app.use(cors({
+  origin: ["https://agriculture-app-ten.vercel.app"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
 
 app.use(express.json());
 
