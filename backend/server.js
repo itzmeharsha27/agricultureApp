@@ -105,12 +105,12 @@ const ConnectDB = require('./config/db.js');
 
 const app = express(); // ✅ Create app FIRST
 
-// ✅ CORS setup
-app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
+// // ✅ CORS setup
+// app.use(cors({
+//   origin: "*",
+//   methods: ["GET", "POST"],
+//   allowedHeaders: ["Content-Type", "Authorization"]
+// }));
 
 app.use(cors({
   origin: ["https://agriculture-app-ten.vercel.app"],
